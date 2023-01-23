@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Etudiant;
 use Illuminate\Http\Request;
+use Intervention\Image\Facades\Image;
 
 class EtudiantController extends Controller
 {
@@ -14,7 +15,42 @@ class EtudiantController extends Controller
      */
     public function index()
     {
-        return response()->json(Etudiant::all());
+        //return response()->json(Etudiant::all());
+
+        $etudiants = Etudiant::all();
+        $etudiants->map(function ($etudiant) {     
+        $etudiant->image = $this->format($etudiant->image);
+                 
+        return $etudiant;
+        });
+       
+        return response()->json($etudiants);
+    }
+
+    public function format($image_name)
+    {
+        if(is_null($image_name)){
+            $path = public_path().'/images/default-avatar.png';
+        }
+        else{
+            $path = public_path().'/images/'.$image_name;
+        }
+        
+        
+/*
+        $type = pathinfo($path, PATHINFO_EXTENSION);
+        $data = file_get_contents($path);     
+        $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+*/
+        $image = Image::make($path)->resize(50, null, function ($constraint) {
+            $constraint->aspectRatio();
+            $constraint->upsize();
+        });
+        $data = (string) $image->encode();
+        $base64 = 'data:image/' . $image->mime() . ';base64,' . base64_encode($data);
+
+
+        return $base64;
     }
 
     /**
@@ -41,8 +77,37 @@ class EtudiantController extends Controller
             'adresse' => 'required',
             'telephone' => 'required',
             'sexe' => 'required',
+            //'file' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',   
+            'file' => 'nullable',        
         ]);
-        $etudiant = Etudiant::create($request->all());
+      
+
+        if (!$request->hasFile('file') || !$request->file('file')->isValid()) {
+            $imageName = null;
+        } else {
+            $imageName = time() . '_' . $request->image . '.' . $request->file('file')->extension();
+            $request->file('file')->move(public_path('images'), $imageName);
+        }
+    
+
+        //$image = new Image;
+        //$image->name = $imageName;
+        //$image->save();
+
+        $etudiant = Etudiant::create(
+            [
+                'nom' => $request->nom,
+                'prenom' => $request->prenom,
+                'adresse' => $request->adresse,
+                'telephone' => $request->telephone,
+                'sexe' => $request->sexe,
+                'image' => $imageName,
+
+            ]
+        );
+
+        $etudiant->image = $this->format($etudiant->image);
+
         return response()->json($etudiant, 201);
     }
 
@@ -79,7 +144,48 @@ class EtudiantController extends Controller
     public function update(Request $request, $id)
     {
         $etudiant = Etudiant::findOrFail($id);
-        $etudiant->update($request->all());
+       
+        $request->validate([
+            'nom' => 'required',
+            'prenom' => 'required',
+            'adresse' => 'required',
+            'telephone' => 'required',
+            'sexe' => 'required',
+            //'file' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',   
+            'file' => 'nullable',        
+        ]);
+      
+        if (!$request->hasFile('file') || !$request->file('file')->isValid()) {
+            $etudiant->update(
+                [
+                    'nom' => $request->nom,
+                    'prenom' => $request->prenom,
+                    'adresse' => $request->adresse,
+                    'telephone' => $request->telephone,
+                    'sexe' => $request->sexe,
+                    'image' => $etudiant->image,
+    
+                ]
+            );
+        } else {
+            $imageName = time() . '_' . $request->image . '.' . $request->file('file')->extension();
+            $request->file('file')->move(public_path('images'), $imageName);
+            if(!is_null($etudiant->image)){
+                unlink(public_path('/images/'.$etudiant->image));
+            } 
+            $etudiant->update(
+                [
+                    'nom' => $request->nom,
+                    'prenom' => $request->prenom,
+                    'adresse' => $request->adresse,
+                    'telephone' => $request->telephone,
+                    'sexe' => $request->sexe,
+                    'image' => $imageName,   
+                ]
+            );
+            
+        }
+        $etudiant->image = $this->format($etudiant->image);
         return response()->json($etudiant);
     }
 
@@ -92,6 +198,9 @@ class EtudiantController extends Controller
     public function destroy($id)
     {
         $etudiant = Etudiant::findOrFail($id);
+        if(!is_null($etudiant->image)){
+            unlink(public_path('/images/'.$etudiant->image));
+        }      
         $etudiant->delete();
         return response()->json(null, 204);
     }

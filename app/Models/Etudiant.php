@@ -14,6 +14,7 @@ class Etudiant extends Model
         'prenom',
         'sexe',
         'adresse',
-        'telephone'
+        'telephone',
+        'image',
     ];
 }
