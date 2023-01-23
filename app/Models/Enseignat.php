@@ -11,6 +11,8 @@ class Enseignat extends Model
     protected $fillable=[
         'nom',
         'prenom',
-        'adress'
+        'adress',
+        'image',
+        'name_img'
     ];
 }

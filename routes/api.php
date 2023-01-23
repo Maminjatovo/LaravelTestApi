@@ -30,10 +30,13 @@ Route::get('/enseignat/{id}', 'App\Http\Controllers\EnseignatController@show');
 Route::post('/enseignat', 'App\Http\Controllers\EnseignatController@store');
 Route::put('/enseignat/{id}', 'App\Http\Controllers\EnseignatController@update');
 Route::delete('/enseignat/{id}', 'App\Http\Controllers\EnseignatController@destroy');
+//Route::post('/enseignat', 'App\Http\Controllers\EnseignatController@upload');
 
 Route::get('/etudiant', 'App\Http\Controllers\EtudiantController@index');
 Route::post('/etudiant', 'App\Http\Controllers\EtudiantController@store');
 Route::get('/etudiant/{id}', 'App\Http\Controllers\EtudiantController@show');
 Route::put('/etudiant/{id}', 'App\Http\Controllers\EtudiantController@update');
 Route::delete('/etudiant/{id}', 'App\Http\Controllers\EtudiantController@destroy');
+
+
 //Route::apiResource('etudiant', 'App\Http\Controllers\EtudiantController');

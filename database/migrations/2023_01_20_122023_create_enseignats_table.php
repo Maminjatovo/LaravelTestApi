@@ -19,9 +19,9 @@ return new class extends Migration
                 $table->string('nom');
                 $table->string('prenom');
                 $table->string('adress');
+                $table->string('name_img')->nullable();
+                $table->binary('image')->nullable();
                 $table->timestamps();
-
-
                 
         });
     }
