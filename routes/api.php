@@ -30,7 +30,6 @@ Route::get('/enseignat/{id}', 'App\Http\Controllers\EnseignatController@show');
 Route::post('/enseignat', 'App\Http\Controllers\EnseignatController@store');
 Route::put('/enseignat/{id}', 'App\Http\Controllers\EnseignatController@update');
 Route::delete('/enseignat/{id}', 'App\Http\Controllers\EnseignatController@destroy');
-//Route::post('/enseignat', 'App\Http\Controllers\EnseignatController@upload');
 
 /**Etudiant */
 
@@ -39,12 +38,6 @@ Route::post('/etudiant', 'App\Http\Controllers\EtudiantController@store');
 Route::get('/etudiant/{id}', 'App\Http\Controllers\EtudiantController@show');
 Route::post('/etudiant/{id}', 'App\Http\Controllers\EtudiantController@update');
 Route::delete('/etudiant/{id}', 'App\Http\Controllers\EtudiantController@destroy');
-<<<<<<< HEAD
-
-
-//Route::apiResource('etudiant', 'App\Http\Controllers\EtudiantController');
-=======
 //Route::apiResource('etudiant', 'App\Http\Controllers\EtudiantController');
 
 Route::post('/image', 'App\Http\Controllers\EtudiantController@copyImage');
->>>>>>> master
